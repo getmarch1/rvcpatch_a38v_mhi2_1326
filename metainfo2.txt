@@ -1,0 +1,53 @@
+#############################################################################
+#                     FreeforALL! Level3 @VWAG                              #
+# This is the description file for the Software Update of Audi components   #
+#                                                                           #
+#############################################################################
+
+[common]
+skipSaveTrainName = "true"
+vendor = "Had"
+region = "Europe"
+region2 = "RoW"
+region3 = "USA"
+region4 = "Japan"
+region5 = "China"
+region6 = "Taiwan"
+variant = "FM2-*-*-*-*"
+variant2 = "QC2-*-*-*-*"
+variant3 = "FMQ-*-*-*-*"
+variant4 = "FMU-*-*-*-*"
+release = "RVCpatch"
+skipMetaCRC = "true"
+skipCheckVariant = "true"
+skipCheckRegion = "true"
+
+[RVCpatch]
+VendorInfo = "Had"
+DeviceDescription = "RVCpatch"
+scriptPost = "./RVCpatch/tools/postscript.sh"
+scriptPostName = "post_script"
+scriptPostCheckSum = "0549EF60A663EF3E9B7FE28E03BC36848D4FC90F"
+scriptPostMaxTime = "300"
+
+[RVCpatch\version\0\default\File]
+checkUpdate = "true"
+CheckSumSize = "524288"
+CheckSum = "E5FA44F2B31C1FB553B6021E7360D07D5D91FF5E"
+FileSize = "2"
+Version = "1"
+Source = "RVCpatch"
+Destination = "/HBpersistence/SWDL/RVCpatch"
+DisplayName = "RVCpatch"
+DeleteDestinationDirBeforeCopy = "false"
+UpdateOnlyExisting = "false"
+  
+[Signature]
+signature1 = "00000000000000000000000000000000"
+signature2 = "00000000000000000000000000000000"
+signature3 = "00000000000000000000000000000000"
+signature4 = "00000000000000000000000000000000"
+signature5 = "00000000000000000000000000000000"
+signature6 = "0000000000014284f1fadcf3ff51dbf5"
+signature7 = "d4997e0635bdc566cd115aa24958f2be"
+signature8 = "86f71dcb04dc9061da378fe534e71b97"
