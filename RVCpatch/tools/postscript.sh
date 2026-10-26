@@ -23,6 +23,8 @@ fail() {
     log "FEHLER: $*"
     log "=== ABGEBROCHEN ==="
     sync
+    mount -ur ${APP}
+    mount -ur ${SYS}
     exit 1
 }
 
@@ -87,6 +89,10 @@ if type cmp > /dev/null 2>&1; then
 else
     log "cmp nicht vorhanden, Verify uebersprungen"
 fi
+
+# Partitionen wieder schreibgeschuetzt
+sync
+mount -ur ${APP} && mount -ur ${SYS} || log "WARNUNG: mount -ur app/system fehlgeschlagen"
 
 log "=== RVC-Patch erfolgreich ==="
 sync
