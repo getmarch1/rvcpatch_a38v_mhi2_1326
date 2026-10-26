@@ -9,3 +9,5 @@ Use at your own risk.
 Create backups before doing anything.
 
 Vibecoded with Claude
+
+FAT32 formatted SD Card needed
