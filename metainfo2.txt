@@ -21,6 +21,7 @@ release = "RVCpatch"
 skipMetaCRC = "true"
 skipCheckVariant = "true"
 skipCheckRegion = "true"
+skipCheckSignatureAndVariant = "true"
 
 [RVCpatch]
 VendorInfo = "Had"
@@ -42,12 +43,3 @@ DisplayName = "RVCpatch"
 DeleteDestinationDirBeforeCopy = "false"
 UpdateOnlyExisting = "false"
   
-[Signature]
-signature1 = "00000000000000000000000000000000"
-signature2 = "00000000000000000000000000000000"
-signature3 = "00000000000000000000000000000000"
-signature4 = "00000000000000000000000000000000"
-signature5 = "00000000000000000000000000000000"
-signature6 = "0000000000014284f1fadcf3ff51dbf5"
-signature7 = "d4997e0635bdc566cd115aa24958f2be"
-signature8 = "86f71dcb04dc9061da378fe534e71b97"
