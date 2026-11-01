@@ -13,6 +13,8 @@ Wanted to make an user-friendly easy SWDLautorun solution if no wifi or d-link i
 
 Audi A3 8V MHI2_ER_AU37x_P5089_MU1326 only at the moment!!!
 
+Download latest Firmware for Audi A3 8V MHI2 here: https://fie.nl.tab.digital/s/ZW7BEcmNtMNTWTR
+
 # **Sidenotes / Install-Notes**
 
 - Vibecoded with Claude
