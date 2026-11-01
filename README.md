@@ -27,7 +27,7 @@ Vibecoded with Claude
 FAT32 formatted SD Card needed
 
 # **Release Notes**
-v0.03 works as intended after metainfo2.txt-Bug got fixed
+v0.03 works as intended after metainfo2.txt-Bug got fixed - thanks to https://github.com/nadeem2626
 
 v0.02 metainfo2-Bug was not fixed (pre-release)
 
