@@ -22,8 +22,6 @@ Create backups before doing anything
 
 # **Sidenotes**
 
-Create backups before doing anything.
-
 Vibecoded with Claude
 
 FAT32 formatted SD Card needed
