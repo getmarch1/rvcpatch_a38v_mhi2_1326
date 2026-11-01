@@ -15,5 +15,5 @@ FAT32 formatted SD Card needed
 
 
 v0.03 works as intended
-<img width="2048" height="1536" alt="1000128633" src="https://github.com/user-attachments/assets/667fa2f9-8cf6-4ec2-9684-56b31df4c552" /> 
-<img width="900" height="1600" alt="WhatsApp Image 2026-11-01 at 14 22 31" src="https://github.com/user-attachments/assets/afc32691-45fc-4051-a3f9-0440a2c36884" />
+<img width="800" height="600" alt="1000128633" src="https://github.com/user-attachments/assets/667fa2f9-8cf6-4ec2-9684-56b31df4c552" /> 
+<img width="600" height="800" alt="WhatsApp Image 2026-11-01 at 14 22 31" src="https://github.com/user-attachments/assets/afc32691-45fc-4051-a3f9-0440a2c36884" />
