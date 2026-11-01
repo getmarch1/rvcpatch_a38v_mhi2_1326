@@ -3,6 +3,8 @@
 
 https://github.com/mrfixpl/Audi-MHI2-RVC-fullscreen
 
+https://github.com/mrfixpl
+
 # **Why?**
 
 Wanted to make an user-friendly easy SWDLautorun solution if no wifi or d-link is available
