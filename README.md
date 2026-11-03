@@ -34,21 +34,6 @@ Download latest Firmware for Audi A3 8V MHI2 here: https://fie.nl.tab.digital/s/
 
 - v0.01 Initial release - metainfo2.txt had a bug in it (pre-release)
 
-# **Untested Uninstaller / Backup recovery**
-- https://fie.nl.tab.digital/s/DWpXGwiyRTKydSm
-
-What the script does:
-
-It immediately renames SWDLautorun.txt to _SWDLautorun.txt to prevent an update loop.
-
-It mounts /app and /system as writable.
-
-It checks up front that all backups exist (displaymanager.json.original, HMIEarlyAppsEvoHighScale_original, HMISystemEvoHighScale_original). If one is missing, it aborts without changing anything.
-
-It copies displaymanager.json, the images and the KZBs back from the backups.
-
-It verifies with cmp (if available), remounts the partitions read-only and writes everything to rvcrestore.log on the SD card.
-
 
 # **Disclaimer**
 
