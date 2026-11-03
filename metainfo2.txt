@@ -53,7 +53,7 @@ VendorInfo = "Had"
 DeviceDescription = "RVCpatch"
 scriptPost = "./RVCpatch/tools/postscript.sh"
 scriptPostName = "post_script"
-scriptPostCheckSum = "FF404465CD125F29A6A2308EB46B9AD7C3EDA976"
+scriptPostCheckSum = "2FC8D7892D2E1768ADD13718AA209F909396A40C"
 scriptPostMaxTime = "300"
 
 [RVCpatch\version\0\default\File]

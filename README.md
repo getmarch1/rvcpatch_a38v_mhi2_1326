@@ -1,52 +1,25 @@
+Idea from https://github.com/mrfixpl/Audi-MHI2-RVC-fullscreen
 
-# **Source / Copyright / Idea**
-
-https://github.com/mrfixpl/Audi-MHI2-RVC-fullscreen
-
-https://github.com/mrfixpl
-
-# **Why?**
-
-Wanted to make an user-friendly easy SWDLautorun solution if no wifi or d-link is available
-
-# **Supported MHI2 Versions**
+Wanted to make an SWDLautorun solution if no wifi or d-link is available
 
 Audi A3 8V MHI2_ER_AU37x_P5089_MU1326 only at the moment!!!
 
-Download latest Firmware for Audi A3 8V MHI2 here: https://fie.nl.tab.digital/s/ZW7BEcmNtMNTWTR (use 7zip to extract)
+Use at your own risk.
 
-# **Sidenotes / Install-Notes**
+Create backups before doing anything.
 
-- Vibecoded with Claude
+Vibecoded with Claude
 
-- FAT32 formatted SD Card needed
-
-- Extract ZIP File and put all files on the root folder of the SD Card
-
-- Put SD Card in Slot1 of the MMI in the Glovebox
-
-- Autostart via SWDLautorun! No need to enter Red Menue manually. Just follow onscreen instructions. Unit may reboot several times
-
-# **Release Notes**
-- v0.03 works as intended after metainfo2.txt-Bug got fixed - thanks to https://github.com/nadeem2626
-
-- v0.02 metainfo2-Bug was not fixed (pre-release)
-
-- v0.01 Initial release - metainfo2.txt had a bug in it (pre-release)
+FAT32 formatted SD Card needed
 
 
-# **Disclaimer**
+## v0.05 (changes)
 
-- Not for commecrial use - if you bought this, you got ripped off!
+- Firmware check: the package only installs on `MHI2_ER_AU37x_P5089_MU1326`. Train and MU are read from the EEPROM (read only) at the very beginning, before anything is changed. If the firmware does not match or cannot be read, the installation is aborted and an error image is shown. The values found are written to `rvcpatch.log`. Set `FW_CHECK=0` at the top of `RVCpatch/tools/postscript.sh` to switch the check off (and update `scriptPostCheckSum` in `metainfo2.txt` afterwards).
 
-- Use at your own risk
+## v0.04 (changes)
 
-- Create backups before doing anything
-
-
-
-# **Examples**
-
-<img width="600" height="400" alt="1000128633" src="https://github.com/user-attachments/assets/667fa2f9-8cf6-4ec2-9684-56b31df4c552" /> 
-
-<img width="400" height="600" alt="WhatsApp Image 2026-11-01 at 14 22 31" src="https://github.com/user-attachments/assets/afc32691-45fc-4051-a3f9-0440a2c36884" />
+- Status images are shown on the display during the installation (check, backup, install, verify, success / error). They are best effort: if showing an image fails, the patch continues unaffected. Set `SHOW_IMAGES=0` at the top of `RVCpatch/tools/postscript.sh` to switch them off (and update `scriptPostCheckSum` in `metainfo2.txt` afterwards).
+- More detailed log: package version, date, free space and checksums (unit vs. package) before and after.
+- Backups are first created under a temporary name and renamed only after copying has finished, so an interrupted backup is never treated as valid.
+- The log `rvcpatch.log` is written to the SD card and additionally to the internal memory (if writable).
