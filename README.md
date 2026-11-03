@@ -19,7 +19,7 @@ FAT32 formatted SD Card needed
 
 ## v0.04 (changes)
 
-- Status images are shown on the display during the installation (check, backup, install, verify, success / error). They are best effort: if showing an image fails, the patch continues unaffected. Set `SHOW_IMAGES=0` at the top of `RVCpatch/tools/postscript.sh` to switch them off (and update `scriptPostCheckSum` in `metainfo2.txt` afterwards).
+~~- Status images are shown on the display during the installation (check, backup, install, verify, success / error). They are best effort: if showing an image fails, the patch continues unaffected. Set `SHOW_IMAGES=0` at the top of `RVCpatch/tools/postscript.sh` to switch them off (and update `scriptPostCheckSum` in `metainfo2.txt` afterwards).~~ does not work :( 
 - More detailed log: package version, date, free space and checksums (unit vs. package) before and after.
 - Backups are first created under a temporary name and renamed only after copying has finished, so an interrupted backup is never treated as valid.
 - The log `rvcpatch.log` is written to the SD card and additionally to the internal memory (if writable).
