@@ -2,7 +2,7 @@
 # RVC-Fullscreen-Patch (Audi A3 8V, MHI2) - Post-Script
 # ${2} = Wurzelverzeichnis des Update-Datentraegers (SD-Karte)
 
-PKG_VERSION="0.05"
+PKG_VERSION="0.07"
 SHOW_IMAGES=1        # 1 = Statusbilder im Display anzeigen, 0 = aus
 FW_CHECK=1           # 1 = nur auf MHI2_ER_AU37x_P5089_MU1326 installieren, 0 = Pruefung aus
 
@@ -23,6 +23,13 @@ IMGBIN=/net/mmx/eso/bin/apps/loadandshowimage
 DMDT=/net/mmx/eso/bin/apps/dmdt
 IMGCFG=/net/mmx/etc/imgprocessing.cfg
 IMG_ON=0
+IMG_FAILED=0
+IMGOUT=/tmp/rvc_img.out.$$
+DBGTMP=/tmp/rvc_img.dbg.$$
+# Umgebung, die die Anzeigeprogramme brauchen (nur fuer deren Aufrufe, siehe imgenv)
+IMG_PATH="/proc/boot:/sbin:/bin:/usr/bin:/usr/sbin:/net/mmx/bin:/net/mmx/usr/bin:/net/mmx/usr/sbin:/net/mmx/sbin"
+IMG_LIBS="/net/mmx/mnt/app/root/lib-target:/net/mmx/mnt/eso/lib:/net/mmx/eso/lib:/net/mmx/mnt/app/usr/lib:/net/mmx/mnt/app/armle/lib:/net/mmx/mnt/app/armle/lib/dll:/net/mmx/mnt/app/armle/usr/lib"
+IMG_IPL=/net/mmx/etc/eso/production
 FAILIMG=06_fehler.png
 
 # Firmware-Pruefung: Train (19 Byte ab 0x3A0) und MU (4 Byte ab 0x3B9) im EEPROM
@@ -39,18 +46,22 @@ log() {
 }
 
 # Log zusaetzlich in den internen Speicher schreiben (falls beschreibbar)
+PLOGDIAG=""
 setup_plog() {
-    for d in /HBpersistence/SWDL/RVCpatch /net/rcc/HBpersistence/SWDL/RVCpatch; do
-        mkdir -p ${d} > /dev/null 2>&1
-        if touch ${d}/.w > /dev/null 2>&1; then
+    for d in /HBpersistence/SWDL/RVCpatch_log /net/rcc/HBpersistence/SWDL/RVCpatch_log; do
+        e1=$(mkdir -p ${d} 2>&1)
+        e2=$(touch ${d}/.w 2>&1)
+        if [ -f ${d}/.w ]; then
             rm -f ${d}/.w
             PLOG=${d}/rvcpatch.log
-            # einfache Begrenzung: ab 64 KB wird das alte Log beiseitegelegt
-            if [ -f ${PLOG} ] && [ $(wc -c < ${PLOG}) -gt 65536 ]; then
+            # einfache Begrenzung: ab 32 KB wird das alte Log beiseitegelegt
+            if [ -f ${PLOG} ] && [ $(wc -c < ${PLOG}) -gt 32768 ]; then
                 mv -f ${PLOG} ${PLOG}.old
             fi
             return 0
         fi
+        PLOGDIAG="${PLOGDIAG}  ${d}: mkdir=[${e1}] touch=[${e2}]
+"
     done
     return 0
 }
@@ -97,51 +108,100 @@ log_info() {
     log "Paketversion: ${PKG_VERSION}"
     log "Datum: $(date 2> /dev/null)"
     log "Medium: ${MEDIA}"
-    log "System: $(uname -a 2> /dev/null)"
     if type df > /dev/null 2>&1; then
         log "--- Speicher (df -k) ---"
-        for p in ${APP} ${SYS}; do
+        for p in ${APP} ${SYS} /HBpersistence; do
             log "$(df -k ${p} 2>&1)"
         done
     fi
-    [ -n "${PLOG}" ] && log "Zweites Log: ${PLOG}"
+    if [ -n "${PLOG}" ]; then
+        log "Zweites Log: ${PLOG}"
+    else
+        log "Zweites Log nicht verfuegbar:"
+        log "${PLOGDIAG}"
+    fi
+    if [ "${SHOW_IMAGES}" = "1" ]; then
+        log "--- Diagnose Bildanzeige ---"
+        log "PATH=${PATH}"
+        log "on: $(type on 2>&1)"
+        # Existenz aus Sicht des MMX-Knotens (vom Script aus sind die Pfade nicht sichtbar)
+        limited 5 on -f mmx ls -l ${IMGBIN} ${DMDT} ${IMGCFG} /net/mmx/etc/config/img.conf
+        for i in ${STATUS}/*.png; do
+            [ -f ${i} ] || log "  Statusbilder fehlen: ${STATUS}"
+            break
+        done
+    fi
 }
 
 # ---------------------------------------------------------- Bildanzeige
-# Alles hier ist "best effort": Fehler werden ignoriert und duerfen den
-# Patch nie beeinflussen. Jeder Aufruf wird nach spaetestens N Sekunden
-# beendet, damit nichts haengen bleibt.
+# Alles hier ist "best effort": Fehler duerfen den Patch nie beeinflussen.
+# Jeder Aufruf wird nach spaetestens N Sekunden beendet. Ergebnis und
+# Ausgabe der Aufrufe stehen zur Fehlersuche im Log ([img]-Zeilen).
+
+# Fuehrt einen Befehl mit der Umgebung aus, die die Anzeigeprogramme brauchen.
+# Wird nur in Hintergrund-/Unterprozessen benutzt, die Umgebung des Scripts
+# bleibt unveraendert.
+imgenv() {
+    PATH=${IMG_PATH}:${PATH}
+    LD_LIBRARY_PATH=${IMG_LIBS}
+    IPL_CONFIG_DIR=${IMG_IPL}
+    LIBIMG_CFGFILE=${IMGCFG}
+    export PATH LD_LIBRARY_PATH IPL_CONFIG_DIR LIBIMG_CFGFILE
+    "$@"
+}
 
 limited() {
     t=$1; shift
-    "$@" > /dev/null 2>&1 &
+    rm -f ${DBGTMP}
+    imgenv "$@" > ${DBGTMP} 2>&1 &
     p=$!
     i=0
     while [ ${i} -lt ${t} ] && kill -0 ${p} 2> /dev/null; do
         sleep 1
         i=$((i + 1))
     done
-    kill -0 ${p} 2> /dev/null && kill ${p} 2> /dev/null
+    if kill -0 ${p} 2> /dev/null; then
+        kill ${p} 2> /dev/null
+        rc="Zeitueberschreitung"
+    else
+        wait ${p}
+        rc="Ende $?"
+    fi
+    log "  [img] $* -> ${rc} $(cat ${DBGTMP} 2>&1)"
+    rm -f ${DBGTMP}
     return 0
 }
 
 show_image() {
     [ "${SHOW_IMAGES}" = "1" ] || return 0
-    [ -f "${STATUS}/$1" ] || return 0
-    export LIBIMG_CFGFILE=${IMGCFG}
-    [ ${IMG_ON} = 1 ] && limited 3 ${IMGBIN} 1 2 3 4 5
-    on -f mmx ${IMGBIN} "${STATUS}/$1" > /dev/null 2>&1 &
-    sleep 1
-    limited 3 on -f mmx ${DMDT} sc 0 -9
-    IMG_ON=1
+    [ ${IMG_FAILED} = 0 ] || return 0
+    [ -f "${STATUS}/$1" ] || { log "  [img] Datei fehlt: ${STATUS}/$1"; return 0; }
+    # das vorherige Bild beenden
+    [ ${IMG_ON} = 1 ] && limited 3 on -f mmx ${IMGBIN} 1 2 3 4 5
+    rm -f ${IMGOUT}
+    imgenv on -f mmx ${IMGBIN} "${STATUS}/$1" > ${IMGOUT} 2>&1 &
+    ip=$!
+    sleep 2
+    if kill -0 ${ip} 2> /dev/null; then
+        # Programm laeuft: Bildschirm auf die Bildebene umschalten
+        limited 3 on -f mmx ${DMDT} sc 0 -9
+        IMG_ON=1
+        log "  [img] zeige $1"
+    else
+        # Programm ist beendet/abgestuerzt: nicht umschalten (sonst schwarzer
+        # Bildschirm) und keine weiteren Versuche in diesem Lauf
+        IMG_ON=0
+        IMG_FAILED=1
+        log "  [img] Anzeige fehlgeschlagen bei $1, keine weiteren Bilder: $(cat ${IMGOUT} 2>&1)"
+    fi
     return 0
 }
 
 hide_image() {
     [ ${IMG_ON} = 1 ] || return 0
-    export LIBIMG_CFGFILE=${IMGCFG}
-    limited 3 ${IMGBIN} 1 2 3 4 5
+    limited 3 on -f mmx ${IMGBIN} 1 2 3 4 5
     limited 3 on -f mmx ${DMDT} sb 0
+    rm -f ${IMGOUT}
     IMG_ON=0
     return 0
 }
@@ -211,12 +271,6 @@ backup_dir() {
 # Liest 32 Byte ab 0x3A0 (Train + MU) und vergleicht die Bytes direkt, ohne
 # Hilfsprogramme zur Textumwandlung. Nichts wird veraendert.
 
-hex2txt() {
-    for b in $*; do
-        printf "\\$(printf '%o' 0x${b})" 2> /dev/null
-    done
-}
-
 check_firmware() {
     if [ "${FW_CHECK}" != "1" ]; then
         log "Firmware-Pruefung deaktiviert (FW_CHECK=0)"
@@ -256,7 +310,7 @@ check_firmware() {
         FAILIMG=08_firmware_unbekannt.png
         fail "Firmware konnte nicht gelesen werden (${n} Bytes erhalten), keine Installation"
     fi
-    log "Firmware gelesen: Train=$(hex2txt ${TRAIN}) MU=$(hex2txt ${MUV}) (hex:${TRAIN} /${MUV})"
+    log "Firmware gelesen (hex): Train:${TRAIN}  MU:${MUV}"
     if [ "${TRAIN}" != "${EXP_TRAIN}" ] || [ "${MUV}" != "${EXP_MU}" ]; then
         FAILIMG=07_firmware_falsch.png
         fail "Firmware ist nicht ${FW_NAME}, keine Installation"
