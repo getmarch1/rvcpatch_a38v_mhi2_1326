@@ -13,6 +13,15 @@ Vibecoded with Claude
 FAT32 formatted SD Card needed
 
 
+## v0.09 (changes)
+
+- Status images: shorter black gap between two images. The helper calls no longer wait in fixed one-second steps, and after the first successfully displayed image the start-up wait is 1 s instead of 2 s. The time each image stays on screen is unchanged.
+
+## v0.08 (changes)
+
+- Verify: `cmp` is not available on the unit, so the copied files are now compared to the package files by checksum (sha1sum, otherwise cksum). On a mismatch the original files are restored and the installation is aborted. The method used is written to `rvcpatch.log`.
+- Success image: new text (the unit restarts, please cancel the rear view documentation afterwards).
+
 ## v0.07 (changes)
 
 - Status images: the library path for the display tool now also contains the graphics driver directories (the log of v0.06 showed a shader error). If the display tool exits or crashes, the screen is no longer switched (no black screen) and no further attempts are made in that run. The reason is written to `rvcpatch.log`.

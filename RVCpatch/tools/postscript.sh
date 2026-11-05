@@ -2,7 +2,7 @@
 # RVC-Fullscreen-Patch (Audi A3 8V, MHI2) - Post-Script
 # ${2} = Wurzelverzeichnis des Update-Datentraegers (SD-Karte)
 
-PKG_VERSION="0.07"
+PKG_VERSION="0.09"
 SHOW_IMAGES=1        # 1 = Statusbilder im Display anzeigen, 0 = aus
 FW_CHECK=1           # 1 = nur auf MHI2_ER_AU37x_P5089_MU1326 installieren, 0 = Pruefung aus
 
@@ -24,6 +24,7 @@ DMDT=/net/mmx/eso/bin/apps/dmdt
 IMGCFG=/net/mmx/etc/imgprocessing.cfg
 IMG_ON=0
 IMG_FAILED=0
+IMG_WAIT=2          # Sekunden Wartezeit beim ersten Bild (Absturzerkennung), danach 1
 IMGOUT=/tmp/rvc_img.out.$$
 DBGTMP=/tmp/rvc_img.dbg.$$
 # Umgebung, die die Anzeigeprogramme brauchen (nur fuer deren Aufrufe, siehe imgenv)
@@ -83,6 +84,30 @@ sumof() {
     else
         echo "n/a"
     fi
+}
+
+# Vergleich Paketdatei <-> kopierte Datei. cmp gibt es auf den Geraeten meist
+# nicht, deshalb werden sonst Pruefsummen verglichen (sha1sum, sonst cksum).
+if type cmp > /dev/null 2>&1; then
+    VMETHOD=cmp
+elif [ -n "${SUMBIN}" ]; then
+    VMETHOD=sha1
+elif type cksum > /dev/null 2>&1; then
+    VMETHOD=cksum
+else
+    VMETHOD=none
+fi
+
+same_file() {
+    case ${VMETHOD} in
+        cmp)
+            cmp -s "$1" "$2"
+            ;;
+        *)
+            a=$(sumof "$1")
+            [ "${a}" != "n/a" ] && [ "${a}" != "fehlt" ] && [ "${a}" = "$(sumof "$2")" ]
+            ;;
+    esac
 }
 
 target_of() {
@@ -150,23 +175,19 @@ imgenv() {
     "$@"
 }
 
+# Fuehrt einen Befehl aus und wartet nur so lange, wie er wirklich braucht
+# (spaetestens N Sekunden, dann wird er beendet).
 limited() {
     t=$1; shift
     rm -f ${DBGTMP}
     imgenv "$@" > ${DBGTMP} 2>&1 &
     p=$!
-    i=0
-    while [ ${i} -lt ${t} ] && kill -0 ${p} 2> /dev/null; do
-        sleep 1
-        i=$((i + 1))
-    done
-    if kill -0 ${p} 2> /dev/null; then
-        kill ${p} 2> /dev/null
-        rc="Zeitueberschreitung"
-    else
-        wait ${p}
-        rc="Ende $?"
-    fi
+    ( sleep ${t}; kill ${p} ) > /dev/null 2>&1 &
+    w=$!
+    wait ${p}
+    rc=$?
+    kill ${w} > /dev/null 2>&1
+    if [ ${rc} = 143 ]; then rc="Zeitueberschreitung"; else rc="Ende ${rc}"; fi
     log "  [img] $* -> ${rc} $(cat ${DBGTMP} 2>&1)"
     rm -f ${DBGTMP}
     return 0
@@ -181,11 +202,12 @@ show_image() {
     rm -f ${IMGOUT}
     imgenv on -f mmx ${IMGBIN} "${STATUS}/$1" > ${IMGOUT} 2>&1 &
     ip=$!
-    sleep 2
+    sleep ${IMG_WAIT}
     if kill -0 ${ip} 2> /dev/null; then
         # Programm laeuft: Bildschirm auf die Bildebene umschalten
         limited 3 on -f mmx ${DMDT} sc 0 -9
         IMG_ON=1
+        IMG_WAIT=1
         log "  [img] zeige $1"
     else
         # Programm ist beendet/abgestuerzt: nicht umschalten (sonst schwarzer
@@ -359,19 +381,19 @@ cp ${SRC}/*.png ${IMG_DIR}/ || { rollback; fail "Kopieren PNG"; }
 cp ${SRC}/OPS_*.kzb ${KZB_DIR}/ || { rollback; fail "Kopieren KZB"; }
 sync
 
-# Kontrolle (nur wenn cmp vorhanden)
+# Kontrolle: kopierte Dateien mit den Paketdateien vergleichen
 show_image 04_kontrolle.png
-if type cmp > /dev/null 2>&1; then
-    cmp -s ${SRC}/displaymanager.json ${DM_DIR}/displaymanager.json || { rollback; fail "Verify displaymanager.json"; }
+if [ "${VMETHOD}" != "none" ]; then
+    same_file ${SRC}/displaymanager.json ${DM_DIR}/displaymanager.json || { rollback; fail "Verify displaymanager.json"; }
     for f in ${SRC}/*.png; do
-        cmp -s ${f} ${IMG_DIR}/${f##*/} || { rollback; fail "Verify ${f##*/}"; }
+        same_file ${f} ${IMG_DIR}/${f##*/} || { rollback; fail "Verify ${f##*/}"; }
     done
     for f in ${SRC}/OPS_*.kzb; do
-        cmp -s ${f} ${KZB_DIR}/${f##*/} || { rollback; fail "Verify ${f##*/}"; }
+        same_file ${f} ${KZB_DIR}/${f##*/} || { rollback; fail "Verify ${f##*/}"; }
     done
-    log "Verify ok"
+    log "Verify ok (Methode: ${VMETHOD})"
 else
-    log "cmp nicht vorhanden, Verify uebersprungen"
+    log "kein Vergleichswerkzeug (cmp/sha1sum/cksum) vorhanden, Verify uebersprungen"
 fi
 log_sums "nachher"
 
