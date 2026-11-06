@@ -13,6 +13,10 @@ Vibecoded with Claude
 FAT32 formatted SD Card needed
 
 
+Patching takes about 4 minutes! Please be patient
+
+
+
 ## v0.09 (changes)
 
 - Status images: shorter black gap between two images. The helper calls no longer wait in fixed one-second steps, and after the first successfully displayed image the start-up wait is 1 s instead of 2 s. The time each image stays on screen is unchanged.
