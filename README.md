@@ -15,7 +15,7 @@ FAT32 formatted SD Card needed
 
 Patching takes about 4 minutes! Please be patient
 
-Big Thank you to @nadeem2626 for fixing the Metainfo-Bug in the early releases
+Big Thank you to @nadeem2626 https://github.com/nadeem2626 for fixing the Metainfo-Bug in the early releases
 
 
 
