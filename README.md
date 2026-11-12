@@ -4,11 +4,9 @@ Wanted to make an SWDLautorun solution if no wifi or d-link is available
 
 Audi A3 8V MHI2_ER_AU37x_P5089_MU1326 only at the moment!!!
 
-Use at your own risk.
+Use at your own risk. Create backups before doing anything.
 
-Create backups before doing anything.
 
-Vibecoded with Claude
 
 FAT32 formatted SD Card needed
 
@@ -16,6 +14,10 @@ FAT32 formatted SD Card needed
 Patching takes about 4 minutes! Please be patient
 
 Big Thank you to @nadeem2626 https://github.com/nadeem2626 for fixing the Metainfo-Bug in the early releases
+
+After Installation you will have to fix DTC1555 Software Version Management fault.
+Use https://mib-helper.com/im-so-xory/ or https://dias-automotive-engineering.com/fix-for-software-version-management-svm-fault-1555-b201a/
+with VCDS, ODIS, OBD11 etc.
 
 
 
