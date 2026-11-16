@@ -2,28 +2,20 @@ Idea from https://github.com/mrfixpl/Audi-MHI2-RVC-fullscreen
 
 Wanted to make an SWDLautorun solution if no wifi or d-link is available
 
-Audi A3 8V MHI2_ER_AU37x_P5089_MU1326 only at the moment!!!
+Audi A3 8V MHI2_ER_AU37x_P5089_MU1326 and MHI2_ER_AU37x_P5153_MU1326 only at the moment!!!
 
-Use at your own risk. Create backups before doing anything.
+Use at your own risk.
 
+Create backups before doing anything.
 
+Vibecoded with Claude
 
 FAT32 formatted SD Card needed
 
 
-Patching takes about 4 minutes! Please be patient
+## v0.10 (changes)
 
-Big Thank you to @nadeem2626 https://github.com/nadeem2626 for fixing the Metainfo-Bug in the early releases
-
-After Installation you will have to fix DTC1555 Software Version Management fault.
-Use https://mib-helper.com/im-so-xory/ or https://dias-automotive-engineering.com/fix-for-software-version-management-svm-fault-1555-b201a/
-with VCDS, ODIS, OBD11 etc.
-
-## Working Firmware Versions
-MHI2_ER_AU37x_P5089_MU1326
-
-MHI2_ER_AU37x_P5153_MU1326 (possible with unofficial Installer without Firmware-Check) 
-
+- Firmware check: in addition to `MHI2_ER_AU37x_P5089_MU1326` the firmware `MHI2_ER_AU37x_P5153_MU1326` is now accepted (the train is read from the EEPROM, the MU stays 1326). Any other firmware still aborts the installation before anything is changed. The firmware error image lists both supported versions.
 
 ## v0.09 (changes)
 

@@ -2,9 +2,9 @@
 # RVC-Fullscreen-Patch (Audi A3 8V, MHI2) - Post-Script
 # ${2} = Wurzelverzeichnis des Update-Datentraegers (SD-Karte)
 
-PKG_VERSION="0.09"
+PKG_VERSION="0.10"
 SHOW_IMAGES=1        # 1 = Statusbilder im Display anzeigen, 0 = aus
-FW_CHECK=1           # 1 = nur auf MHI2_ER_AU37x_P5089_MU1326 installieren, 0 = Pruefung aus
+FW_CHECK=1           # 1 = nur auf den unterstuetzten Firmwarestaenden installieren, 0 = Pruefung aus
 
 MEDIA=${2}
 SRC=${MEDIA}/RVCpatch/payload
@@ -35,9 +35,10 @@ FAILIMG=06_fehler.png
 
 # Firmware-Pruefung: Train (19 Byte ab 0x3A0) und MU (4 Byte ab 0x3B9) im EEPROM
 E2P_BIN=/net/rcc/usr/apps/modifyE2P
-FW_NAME="MHI2_ER_AU37x_P5089_MU1326"
-EXP_TRAIN=" 4d 48 49 32 5f 45 52 5f 41 55 33 37 78 5f 50 35 30 38 39"
-EXP_MU=" 31 33 32 36"
+FW_NAME="MHI2_ER_AU37x_P5089_MU1326 / MHI2_ER_AU37x_P5153_MU1326"
+EXP_TRAIN=" 4d 48 49 32 5f 45 52 5f 41 55 33 37 78 5f 50 35 30 38 39"    # ..._P5089
+EXP_TRAIN2=" 4d 48 49 32 5f 45 52 5f 41 55 33 37 78 5f 50 35 31 35 33"   # ..._P5153
+EXP_MU=" 31 33 32 36"                                                     # MU1326
 
 # ---------------------------------------------------------------- Logging
 
@@ -333,11 +334,16 @@ check_firmware() {
         fail "Firmware konnte nicht gelesen werden (${n} Bytes erhalten), keine Installation"
     fi
     log "Firmware gelesen (hex): Train:${TRAIN}  MU:${MUV}"
-    if [ "${TRAIN}" != "${EXP_TRAIN}" ] || [ "${MUV}" != "${EXP_MU}" ]; then
-        FAILIMG=07_firmware_falsch.png
-        fail "Firmware ist nicht ${FW_NAME}, keine Installation"
+    FW_OK=0
+    if [ "${MUV}" = "${EXP_MU}" ]; then
+        [ "${TRAIN}" = "${EXP_TRAIN}" ] && FW_OK=1
+        [ "${TRAIN}" = "${EXP_TRAIN2}" ] && FW_OK=1
     fi
-    log "Firmware-Pruefung ok (${FW_NAME})"
+    if [ ${FW_OK} != 1 ]; then
+        FAILIMG=07_firmware_falsch.png
+        fail "Firmware nicht unterstuetzt (erlaubt: ${FW_NAME}), keine Installation"
+    fi
+    log "Firmware-Pruefung ok (unterstuetzt: ${FW_NAME})"
 }
 
 # ------------------------------------------------------------------ Start
