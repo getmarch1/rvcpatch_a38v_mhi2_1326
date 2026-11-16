@@ -19,6 +19,10 @@ After Installation you will have to fix DTC1555 Software Version Management faul
 Use https://mib-helper.com/im-so-xory/ or https://dias-automotive-engineering.com/fix-for-software-version-management-svm-fault-1555-b201a/
 with VCDS, ODIS, OBD11 etc.
 
+## Working Firmware Versions
+MHI2_ER_AU37x_P5089_MU1326
+
+MHI2_ER_AU37x_P5153_MU1326 (possible with unofficial Installer without Firmware-Check) 
 
 
 ## v0.09 (changes)
