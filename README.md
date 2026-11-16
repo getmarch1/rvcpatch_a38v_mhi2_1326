@@ -2,15 +2,18 @@ Idea from https://github.com/mrfixpl/Audi-MHI2-RVC-fullscreen
 
 Wanted to make an SWDLautorun solution if no wifi or d-link is available
 
-Audi A3 8V MHI2_ER_AU37x_P5089_MU1326 and MHI2_ER_AU37x_P5153_MU1326 only at the moment!!!
+Audi A3 8V MHI2_ER_AU37x_P5089_MU1326 and MHI2_ER_AU37x_P5153_MU1326 only at the moment
 
 Use at your own risk.
 
 Create backups before doing anything.
 
-Vibecoded with Claude
-
 FAT32 formatted SD Card needed
+
+## Working Firmware Versions
+MHI2_ER_AU37x_P5089_MU1326
+
+MHI2_ER_AU37x_P5153_MU1326 (possible with unofficial Installer without Firmware-Check)
 
 
 ## v0.10 (changes)
