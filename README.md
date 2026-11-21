@@ -13,7 +13,7 @@ FAT32 formatted SD Card needed
 ## Working Firmware Versions
 MHI2_ER_AU37x_P5089_MU1326
 
-MHI2_ER_AU37x_P5153_MU1326 (possible with unofficial Installer without Firmware-Check)
+MHI2_ER_AU37x_P5153_MU1326 
 
 
 ## v0.10 (changes)
