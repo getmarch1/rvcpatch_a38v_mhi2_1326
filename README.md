@@ -15,6 +15,10 @@ MHI2_ER_AU37x_P5089_MU1326
 
 MHI2_ER_AU37x_P5153_MU1326 
 
+## Tester needed
+
+MHI2_ER_AU37x_P5169 should work - testing needed 
+
 
 ## v0.10 (changes)
 
